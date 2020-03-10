@@ -20,7 +20,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.android.datafrominternet.utilities.NetworkUtils;
@@ -37,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView mSearchResultsTextView;
 
     // TODO (12) Create a variable to store a reference to the error message TextView
+    private TextView error_message;
+    private ProgressBar progress_Bar;
 
     // TODO (24) Create a ProgressBar variable to store a reference to the ProgressBar
 
@@ -49,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
 
         mUrlDisplayTextView = (TextView) findViewById(R.id.tv_url_display);
         mSearchResultsTextView = (TextView) findViewById(R.id.tv_github_search_results_json);
+        error_message=(TextView)findViewById(R.id.tv_error_message_display);
+        progress_Bar=(ProgressBar)findViewById(R.id.pb_loading_indicator);
 
         // TODO (13) Get a reference to the error TextView using findViewById
 
@@ -67,6 +73,14 @@ public class MainActivity extends AppCompatActivity {
         mUrlDisplayTextView.setText(githubSearchUrl.toString());
         new GithubQueryTask().execute(githubSearchUrl);
     }
+    private void showJsonDataView(){
+        error_message.setVisibility(View.INVISIBLE);
+        mSearchResultsTextView.setVisibility(View.VISIBLE);
+    }
+    private void showErrorMessage(){
+        error_message.setVisibility(View.VISIBLE);
+        mSearchResultsTextView.setVisibility(View.INVISIBLE);
+    }
 
     // TODO (14) Create a method called showJsonDataView to show the data and hide the error
 
@@ -75,6 +89,14 @@ public class MainActivity extends AppCompatActivity {
     public class GithubQueryTask extends AsyncTask<URL, Void, String> {
 
         // TODO (26) Override onPreExecute to set the loading indicator to visible
+
+
+        @Override
+        protected void onPreExecute() {
+            progress_Bar.setVisibility(View.VISIBLE);
+            super.onPreExecute();
+
+        }
 
         @Override
         protected String doInBackground(URL... params) {
@@ -91,11 +113,17 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String githubSearchResults) {
             // TODO (27) As soon as the loading is complete, hide the loading indicator
+            progress_Bar.setVisibility(View.INVISIBLE);
             if (githubSearchResults != null && !githubSearchResults.equals("")) {
                 // TODO (17) Call showJsonDataView if we have valid, non-null results
+                showJsonDataView();
                 mSearchResultsTextView.setText(githubSearchResults);
             }
+            else {
+                showErrorMessage();
+            }
             // TODO (16) Call showErrorMessage if the result is null in onPostExecute
+
         }
     }
 
